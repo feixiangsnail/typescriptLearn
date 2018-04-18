@@ -1,218 +1,285 @@
-// class Main extends egret.DisplayObjectContainer{
-//     public constructor(){
-//         super();
-//         this.addEventListener(egret.Event.ADDED_TO_STAGE,this.onAddToStage,this);
-//     }
+//////////////////////////////////////////////////////////////////////////////////////
+//
+//  Copyright (c) 2014-present, Egret Technology.
+//  All rights reserved.
+//  Redistribution and use in source and binary forms, with or without
+//  modification, are permitted provided that the following conditions are met:
+//
+//     * Redistributions of source code must retain the above copyright
+//       notice, this list of conditions and the following disclaimer.
+//     * Redistributions in binary form must reproduce the above copyright
+//       notice, this list of conditions and the following disclaimer in the
+//       documentation and/or other materials provided with the distribution.
+//     * Neither the name of the Egret nor the
+//       names of its contributors may be used to endorse or promote products
+//       derived from this software without specific prior written permission.
+//
+//  THIS SOFTWARE IS PROVIDED BY EGRET AND CONTRIBUTORS "AS IS" AND ANY EXPRESS
+//  OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+//  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+//  IN NO EVENT SHALL EGRET AND CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+//  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+//  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;LOSS OF USE, DATA,
+//  OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+//  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+//  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+//  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+//////////////////////////////////////////////////////////////////////////////////////
+import LoadingUI from './LoadingUI';
+export default class Main extends egret.DisplayObjectContainer {
 
-//     private onAddToStage(event:egret.Event)
-//     {
-//         this.drawText();
-//         var shp:egret.Shape = new egret.Shape();
-//         shp.graphics.beginFill( 0xff0000 );
-//         shp.graphics.drawRect( 0,0,100,100);
-//         shp.graphics.endFill();
-//         shp.width = 100;
-//         shp.height = 100;
-//         this.addChild( shp );
-//         var isHit:boolean = shp.hitTestPoint( 10, 10 );
-//         this.infoText.text = "isHit: " + isHit;
-//     }
-//     private infoText:egret.TextField;
-//     private drawText()
-//     {
-//         this.infoText = new egret.TextField();
-//         this.infoText.y = 200;
-//         this.infoText.text = "isHit";
-//         this.addChild( this.infoText );
-//     }
-// }
-
-//----------------------
-import LoadingUI from './LoadingUI'
-export default class Main extends egret.DisplayObject {
-    // Canvas操作对象
-    protected _egret3DCanvas: egret3d.Egret3DCanvas;
-
-    // View3D操作对象
-    protected _view3D: egret3d.View3D;
     /**
-    * look at 摄像机控制器 。</p>
-    * 指定摄像机看向的目标对象。</p>
-    * 1.按下鼠标左键并移动鼠标可以使摄像机绕着目标进行旋转。</p>
-    * 2.按下键盘的(w s a d) 可以摄像机(上 下 左 右)移动。</p>
-    * 3.滑动鼠标滚轮可以控制摄像机的视距。</p>
-    */
-    private cameraCtl: egret3d.LookAtController;
+     * 加载进度界面
+     * Process interface loading
+     */
+    private loadingView:LoadingUI;
 
-    // 灯光组
-    private lights: egret3d.LightGroup = new egret3d.LightGroup();
-
-    // 模型对象
-    private model: egret3d.Mesh;
-
-    // 待机动画
-    private idle: egret3d.SkeletonAnimationClip;
-
-    // 加载界面
-    private loadingUI = new LoadingUI();
     public constructor() {
         super();
-       
-        //创建Canvas对象。
-        this._egret3DCanvas = new egret3d.Egret3DCanvas();
-        //Canvas的起始坐标，页面左上角为起始坐标(0,0)。
-        this._egret3DCanvas.x = 0;
-        this._egret3DCanvas.y = 0;
-        //设置Canvas页面尺寸。
-        this._egret3DCanvas.width = window.innerWidth;
-        this._egret3DCanvas.height = window.innerHeight;
-
-        //创建View3D对象,页面左上角为起始坐标(0,0)
-        this._view3D = new egret3d.View3D(0, 0, window.innerWidth, window.innerHeight);
-        //当前对象对视位置,其参数依次为:
-        //@param pos 对象的位置
-        //@param target 目标的位置
-        this._view3D.camera3D.lookAt(new egret3d.Vector3D(0, 0, 1000), new egret3d.Vector3D(0, 0, 0));
-        //View3D的背景色设置
-        this._view3D.backColor = 0xffffffff;
-        //将View3D添加进Canvas中
-        this._egret3DCanvas.addView3D(this._view3D);
-        //创建平行光
-        var dirLight: egret3d.DirectLight = new egret3d.DirectLight(new egret3d.Vector3D(0.3, -0.3, 0.1));
-        dirLight.diffuse = 0xffffff;
-        this.lights.addLight(dirLight);
-
-        ///创建加载类
-        var load: egret3d.URLLoader = new egret3d.URLLoader();
-        //设置加载完成回调
-        load.addEventListener(egret3d.LoaderEvent3D.LOADER_COMPLETE, this.onLoad, this);
-        //开始加载
-        load.load("resource/LingTong/Bonezero.esm");
-
-        this.InitCameraCtl();
-
-        //启动Canvas。
-        this._egret3DCanvas.start();
-        this._egret3DCanvas.addEventListener(egret3d.Event3D.ENTER_FRAME, this.update, this);
-
-        this.loadingUI.OnInitLoadingView(3);
-
-        //设置window resize事件
-        egret3d.Input.addEventListener(egret3d.Event3D.RESIZE, this.OnWindowResize, this);
+        this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddToStage, this);
     }
 
-    public update(e: egret3d.Event3D) {
-        this.cameraCtl.update();
+    private onAddToStage(event:egret.Event) {
+        //设置加载进度界面
+        //Config to load process interface
+        this.loadingView = new LoadingUI();
+        this.stage.addChild(this.loadingView);
+
+        //初始化Resource资源加载库
+        //initiate Resource loading library
+        RES.addEventListener(RES.ResourceEvent.CONFIG_COMPLETE, this.onConfigComplete, this);
+        RES.loadConfig("resource/resource.json", "resource/");
     }
 
     /**
-    * 窗口尺寸变化事件
-    */
-    private OnWindowResize(e: egret3d.Event3D): void {
-        //重置ui大小
-        this._egret3DCanvas.width = window.innerWidth;
-        this._egret3DCanvas.height = window.innerHeight;
-        this._view3D.width = window.innerWidth;
-        this._view3D.height = window.innerHeight;
+     * 配置文件加载完成,开始预加载preload资源组。
+     * configuration file loading is completed, start to pre-load the preload resource group
+     */
+    private onConfigComplete(event:RES.ResourceEvent):void {
+        RES.removeEventListener(RES.ResourceEvent.CONFIG_COMPLETE, this.onConfigComplete, this);
+        RES.addEventListener(RES.ResourceEvent.GROUP_COMPLETE, this.onResourceLoadComplete, this);
+        RES.addEventListener(RES.ResourceEvent.GROUP_LOAD_ERROR, this.onResourceLoadError, this);
+        RES.addEventListener(RES.ResourceEvent.GROUP_PROGRESS, this.onResourceProgress, this);
+        RES.addEventListener(RES.ResourceEvent.ITEM_LOAD_ERROR, this.onItemLoadError, this);
+        RES.loadGroup("preload");
     }
 
     /**
-    * 初始化相机控制
-    */
-    private InitCameraCtl() {
-        //摄像机控制类
-        this.cameraCtl = new egret3d.LookAtController(this._view3D.camera3D, new egret3d.Object3D());
-        //设置目标和相机的距离
-        this.cameraCtl.distance = 300;
-        //设置相机x轴旋转
-        this.cameraCtl.rotationX = 0;
-    }
-
-    /**
-    * 模型加载回调
-    * @param e: egret3d.URLLoader 加载器对象
-    */
-    protected onLoad(e: egret3d.LoaderEvent3D) {
-        this.loadingUI.OnLoadFinished();
-
-        //创建纹理材质
-        var mat = new egret3d.TextureMaterial();
-        //创建模型基类
-        var ge: egret3d.Geometry = e.loader.data;
-        //生成mesh
-        this.model = new egret3d.Mesh(ge, mat);
-
-        if (ge.vertexFormat & egret3d.VertexFormat.VF_SKIN) {
-            //设置骨骼动画
-            this.model.animation = new egret3d.SkeletonAnimation(ge.skeleton);
+     * preload资源组加载完成
+     * Preload resource group is loaded
+     */
+    private onResourceLoadComplete(event:RES.ResourceEvent):void {
+        if (event.groupName == "preload") {
+            this.stage.removeChild(this.loadingView);
+            RES.removeEventListener(RES.ResourceEvent.GROUP_COMPLETE, this.onResourceLoadComplete, this);
+            RES.removeEventListener(RES.ResourceEvent.GROUP_LOAD_ERROR, this.onResourceLoadError, this);
+            RES.removeEventListener(RES.ResourceEvent.GROUP_PROGRESS, this.onResourceProgress, this);
+            RES.removeEventListener(RES.ResourceEvent.ITEM_LOAD_ERROR, this.onItemLoadError, this);
+            this.init();
         }
-        this.model.material.lightGroup = this.lights;
-        this.model.y = -100;
-
-        //插入model
-        this._view3D.addChild3D(this.model);
-
-        var loadtex: egret3d.URLLoader = new egret3d.URLLoader();
-        //注册贴图读取完成回调
-        loadtex.addEventListener(egret3d.LoaderEvent3D.LOADER_COMPLETE, this.onLoadTexture, this);
-        //开始读取贴图 
-        loadtex.load("resource/LingTong/hero_12.png");
-        loadtex["mat"] = mat;
-
-        var loadAniIdle: egret3d.URLLoader = new egret3d.URLLoader();
-        //注册动画读取完成回调
-        loadAniIdle.addEventListener(egret3d.LoaderEvent3D.LOADER_COMPLETE, this.onAnimationIdle, this);
-        //开始读取动画
-        loadAniIdle.load("resource/LingTong/Idle.eam");
     }
 
     /**
-    * 漫反射贴图加载回调
-    * @param e: egret3d.URLLoader 加载器对象
-    */
-    protected onLoadTexture(e: egret3d.LoaderEvent3D) {
-        this.loadingUI.OnLoadFinished();
-
-        //设置材质的漫反射贴图。
-        e.loader["mat"].diffuseTexture = e.loader.data;
-        //注销回调
-        e.loader.removeEventListener(egret3d.LoaderEvent3D.LOADER_COMPLETE, this.onLoadTexture, this);
+     * 资源组加载出错
+     *  The resource group loading failed
+     */
+    private onItemLoadError(event:RES.ResourceEvent):void {
+        console.warn("Url:" + event.resItem.url + " has failed to load");
     }
 
     /**
-    * 动画加载回调
-    * @param e: egret3d.URLLoader 加载器对象
-    */
-    protected onAnimationIdle(e: egret3d.LoaderEvent3D) {
-        this.loadingUI.OnLoadFinished();
-
-        //骨骼动画
-        this.idle = e.loader.data;
-        //动画名称
-        this.idle.animationName = "idle";
-        //添加clip
-        this.model.animation.skeletonAnimationController.addSkeletonAnimationClip(this.idle);
-        //播放动画
-        this.model.animation.skeletonAnimationController.play(this.idle.animationName);
-        //注销回调
-        this.model.removeEventListener(egret3d.LoaderEvent3D.LOADER_COMPLETE, this.onAnimationIdle, this);
+     * 资源组加载出错
+     *  The resource group loading failed
+     */
+    private onResourceLoadError(event:RES.ResourceEvent):void {
+        //TODO
+        console.warn("Group:" + event.groupName + " has failed to load");
+        //忽略加载失败的项目
+        //Ignore the loading failed projects
+        this.onResourceLoadComplete(event);
     }
 
+    /**
+     * preload资源组加载进度
+     * Loading process of preload resource group
+     */
+    private onResourceProgress(event:RES.ResourceEvent):void {
+        if (event.groupName == "preload") {
+            this.loadingView.setProgress(event.itemsLoaded, event.itemsTotal);
+        }
+    }
+
+   
+
+    /**
+     * 根据name关键字创建一个Bitmap对象。name属性请参考resources/resource.json配置文件的内容。
+     * Create a Bitmap object according to name keyword.As for the property of name please refer to the configuration file of resources/resource.json.
+     */
+    private createBitmapByName(name:string):egret.Bitmap {
+        let result = new egret.Bitmap();
+        let texture:egret.Texture = RES.getRes(name);
+        result.texture = texture;
+        return result;
+    }
+
+    private boy: egret.Bitmap; //新建一个位图对象
+    private bg: egret.Bitmap;//背景
+    private bottom: number = 416;//对齐线的位置
+    private finish: egret.Bitmap;//终点
+    private GstatrTip: egret.Bitmap;//游戏开始图片
+    private GupTip: egret.Bitmap;//点击跳跃指示图
+    private objs: Array<egret.Bitmap> = new Array();//数组保存障碍物
+    private GameOver: boolean = false;
+
+
+     /**
+     * 游戏初始化
+     */
+    private init(): void
+    {
+        //添加背景
+        for (var i = 0; i < 4; i++)
+        {
+            this.bg = this.createBitmapByName("tile_bg")
+            this.addChild(this.bg);
+            this.bg.x = this.bg.width * i;
+        }
+        //添加终点线
+        this.finish = this.createBitmapByName("finish");
+        this.addChild(this.finish);//添加对象到舞台；
+        this.finish.x = 1000;
+        this.finish.y = this.bottom - this.finish.height;
+        //添加障碍物
+        for (var j = 1; j < 4; j++) {
+            var object: egret.Bitmap = this.createBitmapByName("object_0" + j)
+            this.addChild(object);
+            object.x = 150+200*j;
+            object.y = this.bottom - object.height;
+            this.objs.push(object);
+        }
+        //-------------------添加游戏开始指示图
+        this.GstatrTip = this.createBitmapByName("tapToStart");
+        this.addChild(this.GstatrTip);//添加对象到舞台；
+        this.GstatrTip.x = 230;
+        this.GstatrTip.y = this.bottom - this.GstatrTip.height - 50;
+
+        //--------------------点击跳动提示
+        this.GupTip = this.createBitmapByName("tapToJump");
+        this.addChild(this.GupTip);//添加对象到舞台；
+        this.GupTip.x = 230;
+        this.GupTip.y = this.bottom - this.GupTip.height;
+        this.GupTip.visible = false;
+
+        //添加主角
+        this.boy = this.createBitmapByName("green_boy");
+        this.addChild(this.boy);//添加对象到舞台；
+        this.boy.x = 200;
+        this.boy.y = this.bottom - this.boy.height;
+
+        //监听事件
+        this.addEventListener(egret.Event.ENTER_FRAME, this.onEnterFrame, this);
+        this.addEventListener(egret.TouchEvent.TOUCH_BEGIN, this.TouchBegin, this);
+        this.touchEnabled = true;//启用鼠标或者按键响应
+
+        //-----------------------------加载背景音乐
+        this.startLoad();
+        
+    }
+    private Xsleep: number = 0;
+    private Ysleep: number = 0;
+    private Zsleep: number = 0.98;//下落速度
+    private Tyshu: number = 0;//跳跃次数
+    private onEnterFrame(Event: egret.Event): void
+    {
+        if (!this.Gstart || this.GameOver)
+        { return; }
+        
+            this.GupTip.x = this.boy.x + 50;
+            this.Ysleep += this.Zsleep;
+            this.boy.x += this.Xsleep;
+            this.boy.y += this.Ysleep;
+            //落地后恢复初始数据
+            if (this.boy.y >= this.bottom - this.boy.height) {
+                this.boy.y = this.bottom - this.boy.height;
+                this.Ysleep = 0;
+                this.Tyshu = 0;
+            }
+        this.testobjecs(); //碰撞检测调用
+    }
+    private Gstart: boolean = false;
+    //--------------触摸按下事件事件
+    private TouchBegin(Event: egret.TouchEvent): void
+    {
+        if (!this.Gstart) {
+            this.Gstart = true;
+            this.Xsleep = 2;
+            this.GstatrTip.visible = false;
+            this.GupTip.visible = true;
+        }
+        else {
+            if (this.Tyshu < 2) {
+                this.GupTip.visible = false;
+                this.Ysleep = -14;
+                this.Tyshu++;
+            }
+        }
+        if (this.GameOver) {
+            this.GameOver = false;
+            this.GstatrTip.visible = true;
+            this.GupTip.visible = false;
+            this.boy.x = 200;
+            this.boy.y = this.bottom - this.boy.height;
+            return;
+        }
+    }
+    private testobjecs(): void
+    {
+        for (var i = 0; i < this.objs.length; i++)
+        {
+            var objec: egret.Bitmap = this.objs[i];
+            if (this.testboy(objec))
+            {
+                alert("你挂了,点击鼠标重新开始");
+                this.GameOver = true;
+            }
+
+        }
+    }
+
+
+
+    //检测碰撞
+    private testboy(obj: egret.Bitmap): boolean
+    {
+        return obj.hitTestPoint(this.boy.x + this.boy.width * 0.5, this.boy.y + this.boy.height * 0.5);
+    }
+
+
+
+
+
+
+    //添加背景音乐
+    private startLoad(): void {
+        //创建 Sound 对象
+        var sound = new egret.Sound();
+        var url: string = "resource/assets/bg.mp3";
+        //添加加载完成侦听
+        sound.addEventListener(egret.Event.COMPLETE, this.onLoadComplete, this);
+        //开始加载
+        sound.load(url);
+    }
+    private onLoadComplete(event: egret.Event): void {
+        //获取加载到的 Sound 对象
+        var sound: egret.Sound = <egret.Sound>event.target;
+        //播放音乐
+        var channel: egret.SoundChannel = sound.play(0, 0);
+        channel.addEventListener(egret.Event.SOUND_COMPLETE, this.onSoundComplete, this);
+    }
+    private onSoundComplete(event: egret.Event): void {
+        egret.log("onSoundComplete");
+    }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
