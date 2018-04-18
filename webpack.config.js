@@ -10,7 +10,7 @@ var webpack = require('webpack')
     ,OpenBrowserPlugin = require('open-browser-webpack-plugin');
 
 module.exports = {
-    entry:'./src/Main.ts',
+    entry:'./src/index.ts',
     output:{
         path:BUILD_PATH,
         filename:'assets/bundle.js'
