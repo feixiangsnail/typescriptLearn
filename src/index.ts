@@ -1,5 +1,8 @@
-import Main from './app/Main';
 
+import Main from './app/Main';
+let container = document.getElementById('app');
+let main = new Main(container);
+main.run();
 
 
 egret.registerClass(Main, "Main");
