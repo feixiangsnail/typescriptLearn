@@ -27,11 +27,9 @@
 //     }
 // }
 
-
-
 //----------------------
-import LoadingUI from './LoadingUI.ts'
-class Main extends egret.DisplayObject{
+import LoadingUI from './LoadingUI'
+export default class Main extends egret.DisplayObject{
     // Canvas操作对象
     protected _egret3DCanvas: egret3d.Egret3DCanvas;
     
@@ -59,7 +57,7 @@ class Main extends egret.DisplayObject{
     private loadingUI = new LoadingUI();
     public constructor() {
         super();
-        
+        console.log(333);
         //创建Canvas对象。
         this._egret3DCanvas = new egret3d.Egret3DCanvas();
         //Canvas的起始坐标，页面左上角为起始坐标(0,0)。
@@ -218,6 +216,4 @@ class Main extends egret.DisplayObject{
 
 
 
-egret.registerClass(Main, "Main");
-window["Main"] = Main;
-egret.runEgret({renderMode:"webgl", audioType:0});
+

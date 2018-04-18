@@ -4,8 +4,5 @@
 npm install webpack@3.10.1 -g
 npm install
 npm start
-
 http://localhost:8089/
-
-
-打包的时候将libs文件夹复制到build中与index.html同级的位置处
+打包的时候将libs和resource文件夹复制到build中与index.html同级的位置处

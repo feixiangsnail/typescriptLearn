@@ -1,6 +1,7 @@
 
 /*
  */
+import LoadingUI from './LoadingUI'
 class MyDemo extends LoadingUI {
     public constructor() {
         super();
