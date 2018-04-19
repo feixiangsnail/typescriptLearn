@@ -1,13 +1,26 @@
+import Test from './Test';
+import HitTest from './HitTest';
+export default class Main extends egret.DisplayObjectContainer {
+    constructor() {
+        super();
+        this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddToStage, this);
+    }
 
-export default class Main extends egret.DisplayObject {
-   constructor(){
-       super();
-       this.addEventListener(egret.Event.ADDED_TO_STAGE,this.onAddToStage,this);
-   }
+    onAddToStage(event: egret.Event) {
+        // let test: Test = new Test();
+        // this.addChild(test);
 
-   onAddToStage(){
-       console.log('onAddToStage')
-   }
+        let hitTest:HitTest = new HitTest();
+        this.addChild(hitTest);
+
+
+
+
+
+
+
+
+    }
 
 
 
