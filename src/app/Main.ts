@@ -1,5 +1,6 @@
 import Test from './Test';
 import HitTest from './HitTest';
+import './dataJs'
 export default class Main extends egret.DisplayObjectContainer {
     constructor() {
         super();
@@ -10,8 +11,8 @@ export default class Main extends egret.DisplayObjectContainer {
         // let test: Test = new Test();
         // this.addChild(test);
 
-        let hitTest:HitTest = new HitTest();
-        this.addChild(hitTest);
+        // let hitTest:HitTest = new HitTest();
+        // this.addChild(hitTest);
 
 
 
