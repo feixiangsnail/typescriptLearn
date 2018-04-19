@@ -11,40 +11,25 @@ let packageInfo = require('./package.json')
 let BUILD_PATH = './build/'+packageInfo.version;
 //任务
 gulp.task("copy-src", function() {
-    gulp.src(["./src/**/*", "!./src/assets/*","!./src/app/*","!./src/index.html","!./src/index.ts"])
-        .pipe(gulp.dest(BUILD_PATH))
+    gulp.src(["./src/libs*/**/*","./src/resource*/**/*"]).pipe(gulp.dest(BUILD_PATH))
+    
 })
 
-// var jsFiles=[
-// "src/js/webgl-utils.js",
-// "src/js/webgl-debug.js",
-// "src/js/cuon-utils.js",
-// "src/js/cuon-matrix.js",
-// ];
-
-// 	gulp.task("packjs",function(){
-// 		gulp.src(jsFiles).
-// 		pipe(uglify()).
-// 		pipe(concat("webglmain.js")).
-// 		pipe(gulp.dest("./app/js"))
-// 	})
-
-
-//收银压缩js
+//压缩js
 var jsFiles = [
-    "src/libs/modules/egret/egret.min.js",
-    "src/libs/modules/egret/egret.web.min.js",
-    "src/libs/modules/egret3d/egret3d.min.js",
-    "src/libs/modules/game/game.min.js",
-    "src/libs/modules/tween/tween.min.js",
-    "src/libs/modules/res/res.min.js",
-    "src/libs/modules/eui/eui.min.js"
+    "src/libs/modules/egret/egret.js",
+    "src/libs/modules/egret/egret.web.js",
+    
+    "src/libs/modules/egret_4399_h5api/egret_4399_h5api.js",
+    "src/libs/modules/tween/tween.js",
+    "src/libs/modules/res/res.js",
+    "src/libs/modules/eui/eui.js"
 ];
 gulp.task("packjs", function() {
     gulp.src(jsFiles).
     pipe(uglify()).
-    pipe(concat("egret3dPack.js")).
-    pipe(gulp.dest(BUILD_PATH+"/libs/packs"))
+    pipe(concat("lib.js")).
+    pipe(gulp.dest(BUILD_PATH))
 })
 // var cssFiles=[
 //     'src/css/index1.css',
